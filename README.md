@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Image Generator
 
-## Getting Started
+A portfolio project that generates images from text prompts using the free, no-signup [Pollinations](https://pollinations.ai) image API.
 
-First, run the development server:
+## Features
+
+- Text-to-image generation, free with no API key
+- Aspect ratio selector (1:1, 16:9, 9:16, 4:3, 3:2, 2:3)
+- Prompt presets for quick starts
+- Random seed per generation, so repeats of the same prompt differ
+- Session history gallery, click to revisit images
+- Download generated images
+- Friendly handling of free-tier rate limits and timeouts
+
+## Setup
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000). No environment variables required.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## How it works
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `app/page.tsx` - client UI with prompt form, gallery, and download
+- `app/api/generate/route.ts` - server route that calls
+  `https://image.pollinations.ai/prompt/{prompt}` and returns the image as a
+  base64 data URL
 
-## Learn More
+Proxying through the server route keeps the generation request off the
+browser, maps aspect ratios to allowed sizes (max 768x768), attaches a random
+seed, and converts service errors (rate limit, timeout) into clean JSON errors
+the UI can display.
 
-To learn more about Next.js, take a look at the following resources:
+## Free tier limits
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Pollinations allows one image at a time, roughly 45 seconds apart, per IP.
+The UI surfaces this as a clear message. Best effort service: no uptime
+guarantee.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deploy
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Deploys to Vercel with no config and no secrets.
